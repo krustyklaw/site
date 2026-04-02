@@ -213,6 +213,94 @@ footer {
   color: var(--text-muted);
 }
 
+/* Release tag label */
+.release-tag {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* Download loading placeholder */
+.download-loading {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.download-loading a {
+  color: var(--primary);
+}
+
+/* Small button variant for older versions table */
+.btn-sm {
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: var(--transition);
+  background: var(--secondary);
+  color: var(--text-main);
+  border: 1px solid rgba(0,0,0,0.1);
+}
+
+.btn-sm:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: translateY(-1px);
+}
+
+/* Previous Versions Section */
+.previous-versions {
+  padding: 3rem 0 1rem;
+  text-align: center;
+}
+
+.previous-versions h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: var(--text-main);
+}
+
+.version-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  border-radius: 14px;
+  background: var(--glass);
+  border: 1px solid rgba(0,0,0,0.06);
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  text-align: left;
+}
+
+.version-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+
+.version-name {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.version-date {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.version-links {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
 /* Background Decorations */
 .bg-blob {
   position: absolute;

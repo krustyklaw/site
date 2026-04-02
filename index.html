@@ -37,22 +37,14 @@
         <p>A no-config OpenClaw implementation for Windows, Linux, and macOS.</p>
 
         <div class="download-group" id="downloads">
-          <a href="https://github.com/krustyklaw/nullclaw/actions/runs/23778869532/artifacts/6191811581"
-            target="_blank" class="btn btn-primary">
-            <i class="ph ph-microsoft-windows-logo"></i>
-            Download for Windows
-          </a>
-          <a href="https://github.com/krustyklaw/nullclaw/actions/runs/23778869532/artifacts/6191800673"
-            target="_blank" class="btn btn-secondary">
-            <i class="ph ph-linux-logo"></i>
-            Download for Linux
-          </a>
-          <a href="https://github.com/krustyklaw/nullclaw/actions/runs/23778869532/artifacts/6191790843"
-            target="_blank" class="btn btn-secondary">
-            <i class="ph ph-apple-logo"></i>
-            Download for macOS
-          </a>
+          <span class="download-loading">Loading latest release…</span>
         </div>
+        <p class="release-tag" id="release-tag"></p>
+      </section>
+
+      <section class="previous-versions" id="previous-versions" style="display:none">
+        <h2>Previous Versions</h2>
+        <div id="versions-list"></div>
       </section>
 
       <div class="preview-container">
@@ -86,16 +78,91 @@
     </footer>
   </div>
 
-  <!-- Smooth Scroll Script -->
   <script>
+    // Smooth scroll
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
       anchor.addEventListener('click', function (e) {
         e.preventDefault();
-        document.querySelector(this.getAttribute('href')).scrollIntoView({
-          behavior: 'smooth'
-        });
+        document.querySelector(this.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
       });
     });
+
+    const REPO = 'krustyklaw/nullclaw';
+
+    const PLATFORMS = [
+      { key: 'windows', match: 'windows', icon: 'ph-microsoft-windows-logo', label: 'Windows', primary: true },
+      { key: 'linux',   match: 'linux',   icon: 'ph-linux-logo',             label: 'Linux',   primary: false },
+      { key: 'macos',   match: 'macos',   icon: 'ph-apple-logo',             label: 'macOS',   primary: false },
+    ];
+
+    function assetForPlatform(assets, platform) {
+      return assets.find(a => a.name.toLowerCase().includes(platform.match)) || null;
+    }
+
+    function formatDate(iso) {
+      return new Date(iso).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    }
+
+    function renderLatest(release) {
+      const group = document.getElementById('downloads');
+      const tag = document.getElementById('release-tag');
+
+      const buttons = PLATFORMS.map(p => {
+        const asset = assetForPlatform(release.assets, p);
+        if (!asset) return '';
+        const cls = p.primary ? 'btn btn-primary' : 'btn btn-secondary';
+        return `<a href="${asset.browser_download_url}" target="_blank" class="${cls}">
+          <i class="ph ${p.icon}"></i>Download for ${p.label}
+        </a>`;
+      }).join('');
+
+      group.innerHTML = buttons || '<span class="download-loading">No assets found for this release.</span>';
+      tag.textContent = `${release.tag_name} · ${formatDate(release.published_at)}`;
+    }
+
+    function renderOlder(releases) {
+      if (!releases.length) return;
+
+      const section = document.getElementById('previous-versions');
+      const list = document.getElementById('versions-list');
+
+      const rows = releases.map(release => {
+        const links = PLATFORMS.map(p => {
+          const asset = assetForPlatform(release.assets, p);
+          if (!asset) return '';
+          return `<a href="${asset.browser_download_url}" target="_blank" class="btn btn-sm">
+            <i class="ph ${p.icon}"></i>${p.label}
+          </a>`;
+        }).join('');
+
+        return `<div class="version-row">
+          <div class="version-meta">
+            <span class="version-name">${release.tag_name}</span>
+            <span class="version-date">${formatDate(release.published_at)}</span>
+          </div>
+          <div class="version-links">${links || '<span class="text-muted">No assets</span>'}</div>
+        </div>`;
+      }).join('');
+
+      list.innerHTML = rows;
+      section.style.display = '';
+    }
+
+    async function loadReleases() {
+      try {
+        const res = await fetch(`https://api.github.com/repos/${REPO}/releases`);
+        if (!res.ok) throw new Error(res.statusText);
+        const releases = await res.json();
+        if (!releases.length) throw new Error('No releases found');
+        renderLatest(releases[0]);
+        renderOlder(releases.slice(1));
+      } catch (err) {
+        document.getElementById('downloads').innerHTML =
+          `<span class="download-loading">Could not load releases. <a href="https://github.com/${REPO}/releases" target="_blank">View on GitHub</a>.</span>`;
+      }
+    }
+
+    loadReleases();
   </script>
 </body>
 
